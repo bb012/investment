@@ -10,7 +10,7 @@ plugins:
 
 # 사이트 설정
 url: "https://bb012.github.io"
-baseurl: ""
+baseurl: "/bbkim.github.io"
 
 # 소셜 미디어 링크
 github_username: [GitHub 사용자명]
