@@ -1,0 +1,18 @@
+theme: jekyll-theme-minimal
+title: 투자 정보 포털
+description: 투자에 유용한 정보와 도구를 제공하는 종합 투자 가이드 사이트입니다.
+author: 투자 정보 포털
+email: [이메일 주소]
+
+# Jekyll 설정
+plugins:
+  - jekyll-theme-minimal
+
+# 사이트 설정
+url: "https://bb012.github.io"
+baseurl: ""
+
+# 소셜 미디어 링크
+github_username: [GitHub 사용자명]
+twitter_username: [트위터 사용자명]
+linkedin_username: [링크드인 사용자명]

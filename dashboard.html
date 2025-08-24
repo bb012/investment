@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 투자 분석 대시보드</title>
+    <link rel="stylesheet" href="assets/css/investment-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="investment-dashboard">
+        <!-- 헤더 -->
+        <div class="dashboard-header">
+            <h1>📈 실시간 투자 분석 대시보드</h1>
+            <p>특정 종목의 실시간 뉴스, 주가 차트, 가치투자 분석을 제공합니다</p>
+        </div>
+
+        <!-- 종목 검색 -->
+        <div class="search-section">
+            <h2>🔍 종목 검색</h2>
+            <div class="stock-search-container">
+                <input type="text" id="stock-search" placeholder="종목명 또는 종목코드를 입력하세요 (예: 삼성전자, 005930)">
+                <button class="search-button" onclick="searchStocks()">검색</button>
+            </div>
+            <div id="stock-list"></div>
+        </div>
+
+        <!-- 메인 대시보드 -->
+        <div class="dashboard-grid">
+            <!-- 종목 정보 및 차트 -->
+            <div class="stock-info-section">
+                <div id="stock-info">
+                    <div class="loading">종목을 선택하면 정보가 표시됩니다...</div>
+                </div>
+            </div>
+
+            <!-- 차트 영역 -->
+            <div class="chart-section">
+                <div id="price-chart">
+                    <div class="loading">차트를 로딩 중입니다...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 뉴스 섹션 -->
+        <div class="news-section">
+            <div id="news-list">
+                <div class="loading">뉴스를 로딩 중입니다...</div>
+            </div>
+        </div>
+
+        <!-- 분석 정보 -->
+        <div class="analysis-section">
+            <div id="analysis-info">
+                <div class="loading">분석 정보를 로딩 중입니다...</div>
+            </div>
+        </div>
+
+        <!-- 매수 신호 -->
+        <div class="buy-signal-section">
+            <div id="buy-signal">
+                <div class="loading">매수 신호를 분석 중입니다...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="assets/js/investment-dashboard.js"></script>
+    
+    <!-- Chart.js 라이브러리 (실제 차트 구현 시 필요) -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    
+    <script>
+        // 추가 기능들
+        function searchStocks() {
+            const searchInput = document.getElementById('stock-search');
+            const query = searchInput.value.trim();
+            
+            if (query.length >= 2) {
+                // 대시보드 인스턴스에 검색 요청
+                if (window.investmentDashboard) {
+                    window.investmentDashboard.handleStockSearch(query);
+                }
+            }
+        }
+
+        // 엔터키로 검색
+        document.getElementById('stock-search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchStocks();
+            }
+        });
+
+        // 전역 대시보드 인스턴스 저장
+        document.addEventListener('DOMContentLoaded', () => {
+            window.investmentDashboard = new InvestmentDashboard();
+        });
+    </script>
+</body>
+</html>
