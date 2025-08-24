@@ -1,5 +1,60 @@
 /* 투자 분석 대시보드 스타일 */
 
+/* 네비게이션 메뉴 */
+.navigation-menu {
+    background: #2c3e50;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.nav-logo {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.nav-logo:hover {
+    color: #3498db;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    color: #bdc3c7;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: white;
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-link.active {
+    color: white;
+    background: #3498db;
+}
+
 /* 전체 레이아웃 */
 .investment-dashboard {
     max-width: 1200px;
@@ -16,6 +71,28 @@
     border-radius: 15px;
     margin-bottom: 30px;
     text-align: center;
+    position: relative;
+}
+
+.header-top {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.home-link {
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.home-link:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
 }
 
 .dashboard-header h1 {
@@ -513,6 +590,27 @@
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+    .navigation-menu {
+        padding: 10px 0;
+    }
+    
+    .nav-container {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 15px;
+    }
+    
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .nav-link {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    
     .investment-dashboard {
         padding: 15px;
     }

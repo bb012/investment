@@ -139,4 +139,4 @@ permalink: /projects/
 
 ---
 
-[홈으로 돌아가기]({{ site.baseurl }}/)
+[홈으로 돌아가기](/)
