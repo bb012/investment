@@ -320,6 +320,36 @@
     font-weight: 500;
 }
 
+/* 검색 결과 없음 */
+.no-results {
+    text-align: center;
+    padding: 30px 20px;
+    color: #666;
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+/* 로딩 상태 */
+.loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+.loading::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
 /* 메인 대시보드 */
 .dashboard-grid {
     display: grid;

@@ -19,22 +19,58 @@ class InvestmentDashboard {
         this.setupEventListeners();
         this.loadDefaultStock();
         this.startRealTimeUpdates();
+        
+        // 검색 입력창 초기 상태 설정
+        this.setupSearchInput();
+    }
+    
+    // 검색 입력창 초기 설정
+    setupSearchInput() {
+        const searchInput = document.getElementById('stock-search');
+        if (searchInput) {
+            // 검색어가 없을 때 기본 종목 목록 표시
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.length === 0) {
+                    this.displayDefaultStockList('');
+                }
+            });
+            
+            // 검색어 입력 시 실시간 검색
+            searchInput.addEventListener('input', (e) => {
+                this.handleStockSearch(e.target.value);
+            });
+            
+            // 검색어 삭제 시 기본 목록 표시
+            searchInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Backspace' && searchInput.value.length === 0) {
+                    this.displayDefaultStockList('');
+                }
+            });
+        }
     }
 
     // 이벤트 리스너 설정
     setupEventListeners() {
-        // 종목 검색
-        const searchInput = document.getElementById('stock-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => this.handleStockSearch(e.target.value));
+        // 검색 버튼 클릭
+        const searchButton = document.getElementById('search-button');
+        if (searchButton) {
+            searchButton.addEventListener('click', () => {
+                const searchInput = document.getElementById('stock-search');
+                if (searchInput) {
+                    this.handleStockSearch(searchInput.value);
+                }
+            });
         }
 
         // 종목 선택
         const stockList = document.getElementById('stock-list');
         if (stockList) {
             stockList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('stock-item')) {
-                    this.selectStock(e.target.dataset.code);
+                const stockItem = e.target.closest('.stock-item');
+                if (stockItem) {
+                    const stockCode = stockItem.dataset.code;
+                    const stockName = stockItem.dataset.name;
+                    this.selectStock(stockCode, stockName);
                 }
             });
         }
@@ -42,29 +78,57 @@ class InvestmentDashboard {
 
     // 종목 검색 처리
     handleStockSearch(query) {
-        if (query.length < 2) return;
+        if (query.length < 2) {
+            // 검색어가 짧으면 종목 목록 숨기기
+            this.hideStockList();
+            return;
+        }
         
-        // 실제 API에서는 종목 검색 API 호출
-        this.searchStocks(query);
+        // 검색어가 변경되었을 때만 검색 실행
+        if (this.lastSearchQuery !== query) {
+            this.lastSearchQuery = query;
+            this.searchStocks(query);
+        }
     }
 
     // 종목 검색
     async searchStocks(query) {
         try {
-            // 예시 데이터 (실제로는 API 호출)
-            const stocks = [
-                { code: '005930', name: '삼성전자', market: 'KOSPI' },
-                { code: '000660', name: 'SK하이닉스', market: 'KOSPI' },
-                { code: '035420', name: 'NAVER', market: 'KOSPI' },
-                { code: '051910', name: 'LG화학', market: 'KOSPI' }
-            ].filter(stock => 
-                stock.name.includes(query) || stock.code.includes(query)
-            );
-
-            this.displayStockList(stocks);
+            // 실제 크롤링된 데이터에서 검색
+            const response = await fetch('../data/latest_stock_data.json');
+            if (response.ok) {
+                const data = await response.json();
+                const stocks = data.stocks.filter(stock => 
+                    stock.name.toLowerCase().includes(query.toLowerCase()) || 
+                    stock.code.includes(query)
+                );
+                this.displayStockList(stocks);
+            } else {
+                // 폴백: 기본 종목 데이터 사용
+                this.displayDefaultStockList(query);
+            }
         } catch (error) {
             console.error('종목 검색 오류:', error);
+            // 폴백: 기본 종목 데이터 사용
+            this.displayDefaultStockList(query);
         }
+    }
+    
+    // 기본 종목 목록 표시 (폴백)
+    displayDefaultStockList(query) {
+        const defaultStocks = [
+            { code: '005930', name: '삼성전자', market: 'KOSPI' },
+            { code: '003490', name: '대한항공', market: 'KOSPI' },
+            { code: '122870', name: '와이지엔터테인먼트', market: 'KOSPI' },
+            { code: '012450', name: '한화에어로스페이스', market: 'KOSPI' },
+            { code: '005380', name: '현대차', market: 'KOSPI' },
+            { code: '004370', name: '농심', market: 'KOSPI' }
+        ].filter(stock => 
+            stock.name.toLowerCase().includes(query.toLowerCase()) || 
+            stock.code.includes(query)
+        );
+        
+        this.displayStockList(defaultStocks);
     }
 
     // 종목 목록 표시
@@ -72,25 +136,101 @@ class InvestmentDashboard {
         const stockList = document.getElementById('stock-list');
         if (!stockList) return;
 
+        if (stocks.length === 0) {
+            stockList.innerHTML = `
+                <div class="no-results">
+                    <span>검색 결과가 없습니다.</span>
+                </div>
+            `;
+            return;
+        }
+
         stockList.innerHTML = stocks.map(stock => `
-            <div class="stock-item" data-code="${stock.code}">
+            <div class="stock-item" data-code="${stock.code}" data-name="${stock.name}">
                 <span class="stock-name">${stock.name}</span>
                 <span class="stock-code">${stock.code}</span>
                 <span class="stock-market">${stock.market}</span>
             </div>
         `).join('');
+        
+        // 종목 목록 표시
+        stockList.style.display = 'grid';
+    }
+    
+    // 종목 목록 숨기기
+    hideStockList() {
+        const stockList = document.getElementById('stock-list');
+        if (stockList) {
+            stockList.style.display = 'none';
+        }
     }
 
     // 종목 선택
-    async selectStock(stockCode) {
-        this.currentStock = stockCode;
-        await this.loadStockData(stockCode);
-        this.updateDashboard();
+    async selectStock(stockCode, stockName) {
+        // 이전 종목과 다른 종목인 경우에만 업데이트
+        if (this.currentStock !== stockCode) {
+            console.log(`🔄 종목 변경: ${this.currentStockName || '없음'} → ${stockName} (${stockCode})`);
+            
+            this.currentStock = stockCode;
+            this.currentStockName = stockName;
+            
+            // 검색 입력창 초기화
+            this.clearSearchInput();
+            
+            // 종목 목록 숨기기
+            this.hideStockList();
+            
+            // 로딩 상태 표시
+            this.showLoadingState();
+            
+            // 새로운 종목 데이터 로드
+            await this.loadStockData(stockCode);
+            
+            // 대시보드 업데이트
+            this.updateDashboard();
+            
+            // 로딩 상태 숨기기
+            this.hideLoadingState();
+            
+            console.log(`✅ 종목 변경 완료: ${stockName} (${stockCode})`);
+        } else {
+            console.log(`ℹ️ 이미 선택된 종목: ${stockName} (${stockCode})`);
+        }
+    }
+    
+    // 검색 입력창 초기화
+    clearSearchInput() {
+        const searchInput = document.getElementById('stock-search');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.placeholder = `${this.currentStockName} 선택됨`;
+        }
+    }
+    
+    // 로딩 상태 표시
+    showLoadingState() {
+        const stockInfo = document.getElementById('stock-info');
+        const priceChart = document.getElementById('price-chart');
+        
+        if (stockInfo) {
+            stockInfo.innerHTML = '<div class="loading">종목 정보를 로딩 중입니다...</div>';
+        }
+        
+        if (priceChart) {
+            priceChart.innerHTML = '<div class="loading">차트를 로딩 중입니다...</div>';
+        }
+    }
+    
+    // 로딩 상태 숨기기
+    hideLoadingState() {
+        // 로딩 상태는 각 섹션에서 자동으로 업데이트됨
     }
 
     // 종목 데이터 로드
     async loadStockData(stockCode) {
         try {
+            console.log(`📊 종목 데이터 로드 시작: ${stockCode}`);
+            
             // 크롤링된 데이터 파일에서 로드
             await Promise.all([
                 this.loadStockInfo(stockCode),
@@ -98,8 +238,12 @@ class InvestmentDashboard {
                 this.loadNewsData(stockCode),
                 this.loadAnalysisData(stockCode)
             ]);
+            
+            console.log(`✅ 종목 데이터 로드 완료: ${stockCode}`);
         } catch (error) {
             console.error('종목 데이터 로드 오류:', error);
+            // 폴백: 기본 데이터 사용
+            this.loadDefaultData();
         }
     }
 
@@ -113,8 +257,12 @@ class InvestmentDashboard {
             const stock = data.stocks.find(s => s.code === stockCode);
             
             if (stock) {
+                this.stockInfo = stock;
                 this.currentStockData = stock;
-                this.updateStockInfo();
+                console.log(`📈 종목 정보 로드 성공: ${stock.name} (${stock.current_price}원)`);
+            } else {
+                console.warn(`⚠️ 종목 정보를 찾을 수 없음: ${stockCode}`);
+                this.loadDefaultStockInfo(stockCode);
             }
         } catch (error) {
             console.error('종목 정보 로드 실패:', error);
@@ -134,8 +282,9 @@ class InvestmentDashboard {
             
             if (historicalData && historicalData.length > 0) {
                 this.priceData = historicalData;
-                this.updatePriceChart();
+                console.log(`📊 가격 데이터 로드 성공: ${stockCode} (${historicalData.length}개 데이터)`);
             } else {
+                console.warn(`⚠️ 가격 데이터를 찾을 수 없음: ${stockCode}`);
                 // 폴백: 기본 데이터 사용
                 this.loadDefaultPriceData(stockCode);
             }
@@ -201,65 +350,96 @@ class InvestmentDashboard {
 
     // 종목 기본 정보 로드 (폴백)
     async loadDefaultStockInfo(stockCode) {
-        // 예시 데이터
+        // 종목별 기본 정보 설정
+        const stockInfos = {
+            '005930': { name: '삼성전자', currentPrice: 75000, change: 1500, changeRate: 2.04, volume: 15000000, marketCap: 45000000000000 },
+            '003490': { name: '대한항공', currentPrice: 25000, change: 500, changeRate: 2.04, volume: 8000000, marketCap: 18000000000000 },
+            '122870': { name: '와이지엔터테인먼트', currentPrice: 45000, change: 900, changeRate: 2.04, volume: 12000000, marketCap: 25000000000000 },
+            '012450': { name: '한화에어로스페이스', currentPrice: 35000, change: 700, changeRate: 2.04, volume: 10000000, marketCap: 20000000000000 },
+            '005380': { name: '현대차', currentPrice: 180000, change: 3600, changeRate: 2.04, volume: 20000000, marketCap: 35000000000000 },
+            '004370': { name: '농심', currentPrice: 120000, change: 2400, changeRate: 2.04, volume: 15000000, marketCap: 28000000000000 }
+        };
+        
+        const defaultInfo = stockInfos[stockCode] || stockInfos['005930'];
+        
         this.stockInfo = {
             code: stockCode,
-            name: '삼성전자',
-            currentPrice: 75000,
-            change: 1500,
-            changeRate: 2.04,
-            volume: 15000000,
-            marketCap: 45000000000000
+            name: defaultInfo.name,
+            currentPrice: defaultInfo.currentPrice,
+            change: defaultInfo.change,
+            changeRate: defaultInfo.changeRate,
+            volume: defaultInfo.volume,
+            marketCap: defaultInfo.marketCap
         };
+        
+        console.log(`📈 기본 종목 정보 로드: ${this.stockInfo.name} (${stockCode})`);
     }
 
     // 가격 데이터 로드 (폴백)
     async loadDefaultPriceData(stockCode) {
-        // 예시 데이터 (실제로는 차트 API 호출)
-        this.priceData = this.generateSamplePriceData();
+        // 선택된 종목에 맞는 기본 데이터 생성
+        this.priceData = this.generateSamplePriceData(stockCode);
+        console.log(`📊 기본 가격 데이터 생성: ${stockCode}`);
     }
 
     // 뉴스 데이터 로드 (폴백)
     async loadDefaultNewsData() {
-        // 예시 데이터 (실제로는 뉴스 크롤링 API 호출)
-        this.newsData = [
-            {
-                title: '삼성전자, 2분기 실적 전망 긍정적',
-                source: '한국경제',
-                time: '2시간 전',
-                sentiment: 'positive',
-                impact: 'high'
-            },
-            {
-                title: '반도체 시장 회복세, 삼성전자 수혜',
-                source: '매일경제',
-                time: '4시간 전',
-                sentiment: 'positive',
-                impact: 'medium'
-            },
-            {
-                title: '삼성전자 신제품 출시 예정',
-                source: '이데일리',
-                time: '6시간 전',
-                sentiment: 'neutral',
-                impact: 'low'
-            }
-        ];
+        // 종목별 기본 뉴스 데이터
+        const stockNews = {
+            '005930': [
+                { title: '삼성전자, 2분기 실적 전망 긍정적', source: '한국경제', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '글로벌 반도체 수요 증가로 실적 개선 전망', source: '투자신문', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ],
+            '003490': [
+                { title: '대한항공, 여행 수요 회복으로 실적 개선', source: '경제일보', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '국제선 운항 확대 계획 발표', source: '항공신문', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ],
+            '122870': [
+                { title: '와이지엔터테인먼트, 신작 콘텐츠 기대감 상승', source: '엔터테인먼트뉴스', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '글로벌 진출 확대 전략 발표', source: '문화일보', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ],
+            '012450': [
+                { title: '한화에어로스페이스, 방산 수주 확대', source: '방산일보', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '우주개발 프로젝트 참여 확대', source: '과학기술뉴스', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ],
+            '005380': [
+                { title: '현대차, 전기차 판매 호조 지속', source: '자동차신문', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '신기술 개발 투자 확대', source: '경제일보', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ],
+            '004370': [
+                { title: '농심, 해외 시장 진출 확대', source: '식품일보', time: '2시간 전', sentiment: 'positive', impact: '높음' },
+                { title: '신제품 출시로 매출 증가 전망', source: '소비자뉴스', time: '4시간 전', sentiment: 'positive', impact: '중간' }
+            ]
+        };
+        
+        const currentStockCode = this.currentStock || '005930';
+        this.newsData = stockNews[currentStockCode] || stockNews['005930'];
+        
+        console.log(`📰 기본 뉴스 데이터 로드: ${currentStockCode} (${this.newsData.length}건)`);
     }
 
     // 분석 데이터 로드 (폴백)
     async loadDefaultAnalysisData() {
-        // 예시 데이터 (실제로는 분석 API 호출)
+        // 종목별 기본 분석 데이터
+        const stockAnalysis = {
+            '005930': { per: 12.5, pbr: 1.2, roe: 18.5, technicalScore: 75, fundamentalScore: 80, newsScore: 70 },
+            '003490': { per: 8.2, pbr: 0.8, roe: 12.3, technicalScore: 65, fundamentalScore: 70, newsScore: 75 },
+            '122870': { per: 15.8, pbr: 2.1, roe: 14.2, technicalScore: 70, fundamentalScore: 65, newsScore: 80 },
+            '012450': { per: 18.5, pbr: 1.8, roe: 9.8, technicalScore: 60, fundamentalScore: 55, newsScore: 65 },
+            '005380': { per: 6.8, pbr: 0.9, roe: 16.5, technicalScore: 80, fundamentalScore: 85, newsScore: 75 },
+            '004370': { per: 22.3, pbr: 2.5, roe: 11.2, technicalScore: 65, fundamentalScore: 60, newsScore: 70 }
+        };
+        
+        const currentStockCode = this.currentStock || '005930';
+        const defaultAnalysis = stockAnalysis[currentStockCode] || stockAnalysis['005930'];
+        
         this.analysisData = {
-            per: 12.5,
-            pbr: 1.2,
-            roe: 18.5,
-            technicalScore: 75,
-            fundamentalScore: 80,
-            newsScore: 70,
-            totalScore: 75,
+            ...defaultAnalysis,
+            totalScore: Math.round((defaultAnalysis.technicalScore + defaultAnalysis.fundamentalScore + defaultAnalysis.newsScore) / 3),
             recommendation: 'buy' // buy, hold, sell
         };
+        
+        console.log(`📊 기본 분석 데이터 로드: ${currentStockCode}`);
     }
 
     // PER 계산
@@ -330,16 +510,27 @@ class InvestmentDashboard {
     }
 
     // 샘플 가격 데이터 생성
-    generateSamplePriceData() {
+    generateSamplePriceData(stockCode) {
         const data = [];
-        const basePrice = 75000;
+        
+        // 종목별 기본 가격 설정
+        const basePrices = {
+            '005930': 75000,  // 삼성전자
+            '003490': 25000,  // 대한항공
+            '122870': 45000,  // 와이지엔터테인먼트
+            '012450': 35000,  // 한화에어로스페이스
+            '005380': 180000, // 현대차
+            '004370': 120000  // 농심
+        };
+        
+        const basePrice = basePrices[stockCode] || 75000;
         const now = new Date();
         
         for (let i = 30; i >= 0; i--) {
             const date = new Date(now);
             date.setDate(date.getDate() - i);
             
-            const randomChange = (Math.random() - 0.5) * 2000;
+            const randomChange = (Math.random() - 0.5) * (basePrice * 0.1); // ±5% 변동
             const price = basePrice + randomChange;
             
             data.push({
@@ -1046,7 +1237,72 @@ class InvestmentDashboard {
 
     // 기본 종목 로드
     loadDefaultStock() {
-        this.selectStock('005930'); // 삼성전자
+        // 기본 종목 설정 (삼성전자)
+        this.currentStock = '005930';
+        this.currentStockName = '삼성전자';
+        
+        // 기본 데이터 로드
+        this.loadDefaultData();
+        
+        // 기본 종목 목록 표시
+        this.displayDefaultStockList('');
+    }
+    
+    // 기본 데이터 로드
+    loadDefaultData() {
+        const stockCode = this.currentStock || '005930';
+        
+        // 기본 종목 정보 설정
+        this.currentStockData = {
+            code: stockCode,
+            name: this.getStockName(stockCode),
+            market: 'KOSPI',
+            current_price: this.getStockBasePrice(stockCode),
+            change_amount: Math.round(this.getStockBasePrice(stockCode) * 0.02),
+            change_percent: 2.04,
+            volume: 15000000,
+            market_cap: 450000
+        };
+        
+        // 기본 가격 데이터 생성 (30일)
+        this.priceData = this.generateSamplePriceData(stockCode);
+        
+        // 기본 뉴스 데이터
+        this.loadDefaultNewsData();
+        
+        // 기본 분석 데이터
+        this.loadDefaultAnalysisData();
+        
+        // 대시보드 업데이트
+        this.updateDashboard();
+        
+        console.log(`📊 기본 데이터 로드 완료: ${this.currentStockData.name} (${stockCode})`);
+    }
+    
+    // 종목 코드로 종목명 반환
+    getStockName(stockCode) {
+        const stockNames = {
+            '005930': '삼성전자',
+            '003490': '대한항공',
+            '122870': '와이지엔터테인먼트',
+            '012450': '한화에어로스페이스',
+            '005380': '현대차',
+            '004370': '농심'
+        };
+        return stockNames[stockCode] || '삼성전자';
+    }
+    
+    // 종목 코드로 기본 가격 반환
+    getStockBasePrice(stockCode) {
+        const basePrices = {
+            '005930': 75000,  // 삼성전자
+            '003490': 25000,  // 대한항공
+            '122870': 45000,  // 와이지엔터테인먼트
+            '012450': 35000,  // 한화에어로스페이스
+            '005380': 180000, // 현대차
+            '004370': 120000  // 농심
+        };
+        return basePrices[stockCode] || 75000;
     }
 
     // 실시간 업데이트 시작

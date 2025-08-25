@@ -50,28 +50,14 @@ class StockDataCrawler:
         # GitHub Actions 환경 감지
         self.is_github_actions = os.environ.get('GITHUB_ACTIONS', 'false').lower() == 'true'
         
-        # 주요 종목 리스트 (KOSPI, KOSDAQ)
+        # 주요 종목 리스트 (KOSPI)
         self.stock_list = [
             {"code": "005930", "name": "삼성전자", "market": "KOSPI"},
-            {"code": "000660", "name": "SK하이닉스", "market": "KOSPI"},
-            {"code": "035420", "name": "NAVER", "market": "KOSPI"},
-            {"code": "051910", "name": "LG화학", "market": "KOSPI"},
-            {"code": "006400", "name": "삼성SDI", "market": "KOSPI"},
-            {"code": "207940", "name": "삼성바이오로직스", "market": "KOSPI"},
-            {"code": "068270", "name": "셀트리온", "market": "KOSPI"},
-            {"code": "323410", "name": "카카오뱅크", "market": "KOSPI"},
-            {"code": "035720", "name": "카카오", "market": "KOSPI"},
-            {"code": "086790", "name": "하나금융지주", "market": "KOSPI"},
-            {"code": "105560", "name": "KB금융", "market": "KOSPI"},
-            {"code": "055550", "name": "신한지주", "market": "KOSPI"},
-            {"code": "139480", "name": "이마트", "market": "KOSPI"},
-            {"code": "028260", "name": "삼성물산", "market": "KOSPI"},
-            {"code": "017670", "name": "SK텔레콤", "market": "KOSPI"},
-            {"code": "015760", "name": "한국전력", "market": "KOSPI"},
-            {"code": "010950", "name": "S-Oil", "market": "KOSPI"},
-            {"code": "096770", "name": "SK이노베이션", "market": "KOSPI"},
-            {"code": "034020", "name": "두산에너빌리티", "market": "KOSPI"},
-            {"code": "373220", "name": "LG에너지솔루션", "market": "KOSPI"}
+            {"code": "003490", "name": "대한항공", "market": "KOSPI"},
+            {"code": "122870", "name": "와이지엔터테인먼트", "market": "KOSPI"},
+            {"code": "012450", "name": "한화에어로스페이스", "market": "KOSPI"},
+            {"code": "005380", "name": "현대차", "market": "KOSPI"},
+            {"code": "004370", "name": "농심", "market": "KOSPI"}
         ]
         
         # 헤더 설정 (봇 차단 방지)
