@@ -54,6 +54,20 @@
             <div class="chart-section">
                 <h3>📊 주가 차트 & 기술적 지표</h3>
                 <p>주가 추이와 이동평균선, 볼린저 밴드를 통한 기술적 분석</p>
+                <div id="price-summary" class="price-summary" style="display: none;">
+                    <div class="summary-item">
+                        <span class="summary-label">최저가:</span>
+                        <span class="summary-value min-price">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">최고가:</span>
+                        <span class="summary-value max-price">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">현재가:</span>
+                        <span class="summary-value current-price">-</span>
+                    </div>
+                </div>
                 <div id="price-chart">
                     <div class="loading">차트를 로딩 중입니다...</div>
                 </div>
@@ -87,6 +101,8 @@
     
     <!-- Chart.js 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Annotation 플러그인 -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
     
     <script>
         // 추가 기능들

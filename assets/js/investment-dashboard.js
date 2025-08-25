@@ -1,3 +1,8 @@
+// Chart.js Annotation 플러그인 등록
+if (typeof Chart !== 'undefined' && Chart.register) {
+    Chart.register(ChartAnnotation);
+}
+
 // 실시간 투자 분석 대시보드
 class InvestmentDashboard {
     constructor() {
@@ -410,6 +415,16 @@ class InvestmentDashboard {
         const labels = this.priceData.map(item => item.date);
         const prices = this.priceData.map(item => item.price);
         
+        // 최소값과 최대값 찾기
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const minIndex = prices.indexOf(minPrice);
+        const maxIndex = prices.indexOf(maxPrice);
+        const currentPrice = prices[prices.length - 1]; // 현재가 (가장 최근 데이터)
+        
+        // 가격 요약 정보 업데이트
+        this.updatePriceSummary(minPrice, maxPrice, currentPrice);
+        
         // 이동평균선 계산 (5일, 20일)
         const ma5 = this.calculateMovingAverage(prices, 5);
         const ma20 = this.calculateMovingAverage(prices, 20);
@@ -524,6 +539,96 @@ class InvestmentDashboard {
                                     return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
                                 }
                                 return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            minPrice: {
+                                type: 'point',
+                                xValue: minIndex,
+                                yValue: minPrice,
+                                backgroundColor: '#10b981',
+                                borderColor: '#10b981',
+                                borderWidth: 3,
+                                radius: 6,
+                                label: {
+                                    content: `최저: ${minPrice.toLocaleString()}원`,
+                                    position: 'top',
+                                    backgroundColor: '#10b981',
+                                    color: '#fff',
+                                    font: {
+                                        size: 11,
+                                        weight: 'bold'
+                                    },
+                                    padding: 6,
+                                    borderRadius: 4,
+                                    display: true
+                                }
+                            },
+                            maxPrice: {
+                                type: 'point',
+                                xValue: maxIndex,
+                                yValue: maxPrice,
+                                backgroundColor: '#ef4444',
+                                borderColor: '#ef4444',
+                                borderWidth: 3,
+                                radius: 6,
+                                label: {
+                                    content: `최고: ${maxPrice.toLocaleString()}원`,
+                                    position: 'bottom',
+                                    backgroundColor: '#ef4444',
+                                    color: '#fff',
+                                    font: {
+                                        size: 11,
+                                        weight: 'bold'
+                                    },
+                                    padding: 6,
+                                    borderRadius: 4,
+                                    display: true
+                                }
+                            },
+                            minLine: {
+                                type: 'line',
+                                yMin: minPrice,
+                                yMax: minPrice,
+                                borderColor: '#10b981',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: {
+                                    content: `최저가: ${minPrice.toLocaleString()}원`,
+                                    position: 'start',
+                                    backgroundColor: '#10b981',
+                                    color: '#fff',
+                                    font: {
+                                        size: 10,
+                                        weight: 'bold'
+                                    },
+                                    padding: 4,
+                                    borderRadius: 3,
+                                    display: true
+                                }
+                            },
+                            maxLine: {
+                                type: 'line',
+                                yMin: maxPrice,
+                                yMax: maxPrice,
+                                borderColor: '#ef4444',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: {
+                                    content: `최고가: ${maxPrice.toLocaleString()}원`,
+                                    position: 'end',
+                                    backgroundColor: '#ef4444',
+                                    color: '#fff',
+                                    font: {
+                                        size: 10,
+                                        weight: 'bold'
+                                    },
+                                    padding: 4,
+                                    borderRadius: 3,
+                                    display: true
+                                }
                             }
                         }
                     }
@@ -667,6 +772,36 @@ class InvestmentDashboard {
         }
         
         return { upper, lower };
+    }
+    
+    // 가격 요약 정보 업데이트
+    updatePriceSummary(minPrice, maxPrice, currentPrice) {
+        const summaryElement = document.getElementById('price-summary');
+        if (!summaryElement) return;
+        
+        // 요약 정보 표시
+        summaryElement.style.display = 'flex';
+        
+        // 최저가 업데이트
+        const minPriceElement = summaryElement.querySelector('.min-price');
+        if (minPriceElement) {
+            minPriceElement.textContent = minPrice.toLocaleString() + '원';
+            minPriceElement.className = 'summary-value min-price';
+        }
+        
+        // 최고가 업데이트
+        const maxPriceElement = summaryElement.querySelector('.max-price');
+        if (maxPriceElement) {
+            maxPriceElement.textContent = maxPrice.toLocaleString() + '원';
+            maxPriceElement.className = 'summary-value max-price';
+        }
+        
+        // 현재가 업데이트
+        const currentPriceElement = summaryElement.querySelector('.current-price');
+        if (currentPriceElement) {
+            currentPriceElement.textContent = currentPrice.toLocaleString() + '원';
+            currentPriceElement.className = 'summary-value current-price';
+        }
     }
 
     // 뉴스 목록 업데이트

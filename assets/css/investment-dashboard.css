@@ -292,12 +292,58 @@
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    height: 400px; /* 차트 높이 고정 */
+    height: auto; /* 높이 자동 조정 */
+}
+
+/* 가격 요약 정보 */
+.price-summary {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.85em;
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-value {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.summary-value.min-price {
+    color: #10b981;
+}
+
+.summary-value.max-price {
+    color: #ef4444;
+}
+
+.summary-value.current-price {
+    color: #3b82f6;
 }
 
 #price-chart-canvas {
     width: 100% !important;
-    height: 100% !important;
+    height: 400px !important; /* 차트 높이 고정 */
 }
 
 .chart-placeholder {
