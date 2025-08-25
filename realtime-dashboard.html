@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 종합 지수 대시보드</title>
+    <link rel="stylesheet" href="assets/css/investment-dashboard.css?v=1.1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 네비게이션 메뉴 -->
+    <nav class="navigation-menu">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">📈 투자 분석</a>
+            <div class="nav-links">
+                <a href="realtime-dashboard.html" class="nav-link active">실시간 대시보드</a>
+                <a href="dashboard.html" class="nav-link">종목 분석</a>
+                <a href="market-trends.html" class="nav-link">시장 동향</a>
+                                            <a href="investment-tools.html" class="nav-link">투자 도구</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="investment-dashboard">
+        <!-- 헤더 -->
+        <div class="dashboard-header">
+            <div class="header-top">
+                <a href="index.html" class="home-link">🏠 홈으로</a>
+            </div>
+            <h1>📊 실시간 종합 지수 대시보드</h1>
+            <p>KOSPI, KOSDAQ, 글로벌 지수, 원자재, 암호화폐 실시간 정보와 경제 뉴스를 제공합니다</p>
+        </div>
+
+        <!-- 주요 지수 섹션 -->
+        <div class="indices-section">
+            <h2>📈 주요 지수</h2>
+            <div class="indices-grid">
+                <!-- 국내 지수 -->
+                <div class="index-category">
+                    <h3>🇰🇷 국내 지수</h3>
+                    <div class="index-items">
+                        <div class="index-item" id="kospi">
+                            <div class="index-header">
+                                <span class="index-name">📈 KOSPI</span>
+                                <span class="index-code">KS11</span>
+                            </div>
+                            <div class="index-price">2,450.00</div>
+                            <div class="index-change positive">+15.50 (+0.64%)</div>
+                        </div>
+                        <div class="index-item" id="kosdaq">
+                            <div class="index-header">
+                                <span class="index-name">🚀 KOSDAQ</span>
+                                <span class="index-code">KQ11</span>
+                            </div>
+                            <div class="index-price">850.25</div>
+                            <div class="index-change positive">+8.75 (+1.04%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 글로벌 지수 -->
+                <div class="index-category">
+                    <h3>🌍 글로벌 지수</h3>
+                    <div class="index-items">
+                        <div class="index-item" id="sp500">
+                            <div class="index-header">
+                                <span class="index-name">🇺🇸 S&P 500</span>
+                                <span class="index-code">SPX</span>
+                            </div>
+                            <div class="index-price">4,850.50</div>
+                            <div class="index-change positive">+25.30 (+0.52%)</div>
+                        </div>
+                        <div class="index-item" id="nasdaq">
+                            <div class="index-header">
+                                <span class="index-name">💻 NASDAQ</span>
+                                <span class="index-code">IXIC</span>
+                            </div>
+                            <div class="index-price">15,250.75</div>
+                            <div class="index-change negative">-45.20 (-0.30%)</div>
+                        </div>
+                        <div class="index-item" id="dow">
+                            <div class="index-header">
+                                <span class="index-name">🏭 DOW</span>
+                                <span class="index-code">DJI</span>
+                            </div>
+                            <div class="index-price">38,250.00</div>
+                            <div class="index-change positive">+125.50 (+0.33%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 원자재 -->
+                <div class="index-category">
+                    <h3>💰 원자재</h3>
+                    <div class="index-items">
+                        <div class="index-item" id="gold">
+                            <div class="index-header">
+                                <span class="index-name">🥇 금</span>
+                                <span class="index-code">XAUUSD</span>
+                            </div>
+                            <div class="index-price">$2,150.50</div>
+                            <div class="index-change positive">+12.30 (+0.58%)</div>
+                        </div>
+                        <div class="index-item" id="oil">
+                            <div class="index-header">
+                                <span class="index-name">🛢️ WTI 원유</span>
+                                <span class="index-code">CL</span>
+                            </div>
+                            <div class="index-price">$78.25</div>
+                            <div class="index-change negative">-1.50 (-1.88%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 암호화폐 -->
+                <div class="index-category">
+                    <h3>🪙 암호화폐</h3>
+                    <div class="index-items">
+                        <div class="index-item" id="bitcoin">
+                            <div class="index-header">
+                                <span class="index-name">₿ 비트코인</span>
+                                <span class="index-code">BTC</span>
+                            </div>
+                            <div class="index-price">$65,250.00</div>
+                            <div class="index-change positive">+1,250.00 (+1.96%)</div>
+                        </div>
+                        <div class="index-item" id="ethereum">
+                            <div class="index-header">
+                                <span class="index-name">Ξ 이더리움</span>
+                                <span class="index-code">ETH</span>
+                            </div>
+                            <div class="index-price">$3,450.75</div>
+                            <div class="index-change positive">+45.25 (+1.33%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- 시장 동향 요약 -->
+        <div class="market-summary-section">
+            <h2>📊 시장 동향 요약</h2>
+            <div class="summary-grid">
+                <div class="summary-item positive">
+                    <h3>상승 종목</h3>
+                    <div class="summary-content">
+                        <p>반도체, AI 관련 종목들이 상승세</p>
+                        <span class="summary-count">+45종목</span>
+                    </div>
+                </div>
+                <div class="summary-item negative">
+                    <h3>하락 종목</h3>
+                    <div class="summary-content">
+                        <p>금융, 건설 관련 종목들이 하락세</p>
+                        <span class="summary-count">-32종목</span>
+                    </div>
+                </div>
+                <div class="summary-item neutral">
+                    <h3>보합 종목</h3>
+                    <div class="summary-content">
+                        <p>에너지, 소비재 관련 종목들이 보합세</p>
+                        <span class="summary-count">23종목</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="assets/js/realtime-dashboard.js"></script>
+</body>
+</html>
