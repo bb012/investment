@@ -292,12 +292,6 @@
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    height: 400px; /* 차트 높이 고정 */
-}
-
-#price-chart-canvas {
-    width: 100% !important;
-    height: 100% !important;
 }
 
 .chart-placeholder {

@@ -5,7 +5,6 @@ class InvestmentDashboard {
         this.newsData = [];
         this.priceData = [];
         this.analysisData = {};
-        this.priceChart = null; // 차트 인스턴스 저장
         this.init();
     }
 
@@ -233,105 +232,22 @@ class InvestmentDashboard {
 
     // 차트 생성
     createPriceChart(container) {
-        // 기존 차트가 있다면 제거
-        if (this.priceChart) {
-            this.priceChart.destroy();
-        }
-
-        // 차트 컨테이너 초기화
-        container.innerHTML = '<canvas id="price-chart-canvas"></canvas>';
-        
-        const ctx = container.querySelector('#price-chart-canvas').getContext('2d');
-        
-        // 차트 데이터 준비
-        const labels = this.priceData.map(item => item.date);
-        const prices = this.priceData.map(item => item.price);
-        
-        // 차트 생성
-        this.priceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '주가',
-                    data: prices,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#667eea',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '주가 차트 (30일)',
-                        font: {
-                            size: 16,
-                            weight: 'bold'
-                        }
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return '주가: ' + context.parsed.y.toLocaleString() + '원';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '날짜'
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: '주가 (원)'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString() + '원';
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                elements: {
-                    point: {
-                        hoverBackgroundColor: '#5a6fd8'
-                    }
-                }
-            }
-        });
+        // Chart.js를 사용한 차트 구현
+        // 실제 구현에서는 Chart.js 라이브러리를 포함해야 함
+        container.innerHTML = `
+            <div class="chart-placeholder">
+                <h3>주가 차트</h3>
+                <p>Chart.js 라이브러리를 사용하여 실시간 차트를 표시합니다.</p>
+                <div class="chart-data">
+                    ${this.priceData.map(item => `
+                        <div class="data-point">
+                            <span class="date">${item.date}</span>
+                            <span class="price">${item.price.toLocaleString()}원</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
     }
 
     // 뉴스 목록 업데이트
@@ -484,22 +400,7 @@ class InvestmentDashboard {
             this.stockInfo.change += randomChange;
             this.stockInfo.changeRate = (this.stockInfo.change / (this.stockInfo.currentPrice - this.stockInfo.change)) * 100;
             
-            // 새로운 가격 데이터 추가
-            const now = new Date();
-            const newDataPoint = {
-                date: now.toISOString().split('T')[0],
-                price: this.stockInfo.currentPrice,
-                volume: Math.floor(Math.random() * 20000000) + 10000000
-            };
-            
-            // 최신 30개 데이터만 유지
-            this.priceData.push(newDataPoint);
-            if (this.priceData.length > 30) {
-                this.priceData.shift();
-            }
-            
             this.updateStockInfo();
-            this.updatePriceChart(); // 차트 업데이트
         }
     }
 
