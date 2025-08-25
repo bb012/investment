@@ -164,6 +164,122 @@
     gap: 15px;
 }
 
+/* 수동 크롤링 섹션 */
+.manual-crawling-section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    border-left: 4px solid #3b82f6;
+}
+
+.manual-crawling-section h2 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.4em;
+}
+
+.manual-crawling-section p {
+    margin: 0 0 20px 0;
+    color: #7f8c8d;
+    font-size: 0.95em;
+}
+
+.crawling-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.crawl-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.crawl-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.crawl-button:active {
+    transform: translateY(0);
+}
+
+.crawl-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-icon {
+    font-size: 1.2em;
+}
+
+.btn-text {
+    font-weight: 600;
+}
+
+.crawling-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.status-text {
+    color: #3b82f6;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.status-indicator.success .status-text {
+    color: #10b981;
+}
+
+.status-indicator.error .status-text {
+    color: #ef4444;
+}
+
+.status-icon {
+    font-size: 1.2em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .stock-item {
     background: #f8f9fa;
     padding: 20px;

@@ -40,6 +40,24 @@
             </div>
             <div id="stock-list"></div>
         </div>
+        
+        <!-- 수동 크롤링 섹션 -->
+        <div class="manual-crawling-section">
+            <h2>🔄 수동 데이터 업데이트</h2>
+            <p>최신 주식 데이터를 수동으로 수집하여 업데이트합니다</p>
+            <div class="crawling-controls">
+                <button id="manual-crawl-btn" class="crawl-button" onclick="manualCrawl()">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text">데이터 수집 시작</span>
+                </button>
+                <div id="crawling-status" class="crawling-status" style="display: none;">
+                    <div class="status-indicator">
+                        <span class="spinner"></span>
+                        <span class="status-text">데이터 수집 중...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 메인 대시보드 -->
         <div class="dashboard-grid">
@@ -115,6 +133,13 @@
                 if (window.investmentDashboard) {
                     window.investmentDashboard.handleStockSearch(query);
                 }
+            }
+        }
+        
+        // 수동 크롤링 실행
+        function manualCrawl() {
+            if (window.investmentDashboard) {
+                window.investmentDashboard.manualCrawl();
             }
         }
 

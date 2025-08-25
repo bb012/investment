@@ -5,6 +5,8 @@ on:
     # 매일 새벽 1시 (UTC 기준, 한국 시간 새벽 10시)
     - cron: '0 1 * * *'
   workflow_dispatch: # 수동 실행 가능
+  repository_dispatch: # 외부 API를 통한 수동 실행
+    types: [manual-crawl]
   push:
     branches: [ main ]
     paths:

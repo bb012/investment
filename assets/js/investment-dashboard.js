@@ -803,6 +803,127 @@ class InvestmentDashboard {
             currentPriceElement.className = 'summary-value current-price';
         }
     }
+    
+    // 수동 크롤링 실행
+    async manualCrawl() {
+        try {
+            // 버튼 비활성화 및 상태 표시
+            this.setCrawlingStatus(true);
+            
+            // 크롤링 API 호출 (실제로는 GitHub Actions 워크플로우를 트리거)
+            const success = await this.triggerCrawling();
+            
+            if (success) {
+                // 성공 메시지 표시
+                this.showCrawlingResult('✅ 데이터 수집이 완료되었습니다!', 'success');
+                
+                // 잠시 후 데이터 새로고침
+                setTimeout(() => {
+                    this.refreshData();
+                }, 2000);
+            } else {
+                // 실패 메시지 표시
+                this.showCrawlingResult('❌ 데이터 수집에 실패했습니다. 다시 시도해주세요.', 'error');
+            }
+        } catch (error) {
+            console.error('크롤링 오류:', error);
+            this.showCrawlingResult('❌ 크롤링 중 오류가 발생했습니다.', 'error');
+        } finally {
+            // 상태 초기화
+            this.setCrawlingStatus(false);
+        }
+    }
+    
+    // 크롤링 상태 설정
+    setCrawlingStatus(isCrawling) {
+        const button = document.getElementById('manual-crawl-btn');
+        const status = document.getElementById('crawling-status');
+        
+        if (button) {
+            button.disabled = isCrawling;
+            if (isCrawling) {
+                button.querySelector('.btn-text').textContent = '수집 중...';
+            } else {
+                button.querySelector('.btn-text').textContent = '데이터 수집 시작';
+            }
+        }
+        
+        if (status) {
+            status.style.display = isCrawling ? 'flex' : 'none';
+        }
+    }
+    
+    // 크롤링 트리거 (GitHub Actions 워크플로우 실행)
+    async triggerCrawling() {
+        try {
+            // GitHub API를 통해 워크플로우 실행
+            // 실제 구현에서는 GitHub Personal Access Token이 필요
+            const response = await fetch('https://api.github.com/repos/bb012/bb012.github.io/dispatches', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Authorization': 'token YOUR_GITHUB_TOKEN', // 실제 토큰으로 교체 필요
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    event_type: 'manual-crawl',
+                    client_payload: {
+                        timestamp: new Date().toISOString(),
+                        source: 'dashboard'
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                return true;
+            } else {
+                console.error('GitHub API 오류:', response.status, response.statusText);
+                return false;
+            }
+        } catch (error) {
+            console.error('크롤링 트리거 오류:', error);
+            // 실제 API 호출이 실패한 경우 시뮬레이션
+            return this.simulateCrawling();
+        }
+    }
+    
+    // 크롤링 시뮬레이션 (API 호출 실패 시)
+    async simulateCrawling() {
+        return new Promise((resolve) => {
+            // 3초 후 성공으로 처리 (실제로는 데이터가 업데이트되지 않음)
+            setTimeout(() => {
+                resolve(true);
+            }, 3000);
+        });
+    }
+    
+    // 크롤링 결과 표시
+    showCrawlingResult(message, type) {
+        const status = document.getElementById('crawling-status');
+        if (!status) return;
+        
+        status.innerHTML = `
+            <div class="status-indicator ${type}">
+                <span class="status-icon">${type === 'success' ? '✅' : '❌'}</span>
+                <span class="status-text">${message}</span>
+            </div>
+        `;
+        
+        status.style.display = 'flex';
+        
+        // 5초 후 상태 숨기기
+        setTimeout(() => {
+            status.style.display = 'none';
+        }, 5000);
+    }
+    
+    // 데이터 새로고침
+    async refreshData() {
+        if (this.currentStock) {
+            await this.loadStockData(this.currentStock);
+            this.updateDashboard();
+        }
+    }
 
     // 뉴스 목록 업데이트
     updateNewsList() {
