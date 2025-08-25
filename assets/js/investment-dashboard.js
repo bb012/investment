@@ -243,29 +243,81 @@ class InvestmentDashboard {
         
         const ctx = container.querySelector('#price-chart-canvas').getContext('2d');
         
-        // 차트 데이터 준비
+        // 차트 데이터 준비 (OHLC 데이터 시뮬레이션)
         const labels = this.priceData.map(item => item.date);
         const prices = this.priceData.map(item => item.price);
+        
+        // 이동평균선 계산 (5일, 20일)
+        const ma5 = this.calculateMovingAverage(prices, 5);
+        const ma20 = this.calculateMovingAverage(prices, 20);
+        
+        // 볼린저 밴드 계산
+        const bbData = this.calculateBollingerBands(prices, 20, 2);
         
         // 차트 생성
         this.priceChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '주가',
-                    data: prices,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#667eea',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
+                datasets: [
+                    {
+                        label: '주가',
+                        data: prices,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.1,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '5일 이동평균',
+                        data: ma5,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '20일 이동평균',
+                        data: ma20,
+                        borderColor: '#dc2626',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '볼린저 상단',
+                        data: bbData.upper,
+                        borderColor: 'rgba(156, 163, 175, 0.5)',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '볼린저 하단',
+                        data: bbData.lower,
+                        borderColor: 'rgba(156, 163, 175, 0.5)',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    }
+                ]
             },
             options: {
                 responsive: true,
@@ -273,22 +325,42 @@ class InvestmentDashboard {
                 plugins: {
                     title: {
                         display: true,
-                        text: '주가 차트 (30일)',
+                        text: '주가 차트 & 기술적 지표',
                         font: {
-                            size: 16,
+                            size: 18,
                             weight: 'bold'
-                        }
+                        },
+                        color: '#1f2937'
                     },
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12
+                            }
+                        }
                     },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#374151',
+                        borderWidth: 1,
                         callbacks: {
                             label: function(context) {
-                                return '주가: ' + context.parsed.y.toLocaleString() + '원';
+                                if (context.dataset.label === '주가') {
+                                    return '주가: ' + context.parsed.y.toLocaleString() + '원';
+                                } else if (context.dataset.label.includes('이동평균')) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
+                                } else if (context.dataset.label.includes('볼린저')) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
+                                }
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + '원';
                             }
                         }
                     }
@@ -298,22 +370,46 @@ class InvestmentDashboard {
                         display: true,
                         title: {
                             display: true,
-                            text: '날짜'
+                            text: '날짜',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#374151'
                         },
                         grid: {
-                            display: false
+                            color: 'rgba(156, 163, 175, 0.2)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
                         }
                     },
                     y: {
+                        type: 'linear',
                         display: true,
+                        position: 'left',
                         title: {
                             display: true,
-                            text: '주가 (원)'
+                            text: '주가 (원)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#374151'
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
+                            color: 'rgba(156, 163, 175, 0.2)',
+                            drawBorder: false
                         },
                         ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            },
                             callback: function(value) {
                                 return value.toLocaleString() + '원';
                             }
@@ -327,11 +423,58 @@ class InvestmentDashboard {
                 },
                 elements: {
                     point: {
-                        hoverBackgroundColor: '#5a6fd8'
+                        hoverBackgroundColor: '#1d4ed8',
+                        hoverBorderColor: '#fff',
+                        hoverBorderWidth: 3
+                    }
+                },
+                layout: {
+                    padding: {
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
                     }
                 }
             }
         });
+    }
+
+    // 이동평균 계산
+    calculateMovingAverage(data, period) {
+        const result = [];
+        for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) {
+                result.push(null);
+            } else {
+                const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+                result.push(sum / period);
+            }
+        }
+        return result;
+    }
+
+    // 볼린저 밴드 계산
+    calculateBollingerBands(data, period, multiplier) {
+        const upper = [];
+        const lower = [];
+        
+        for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) {
+                upper.push(null);
+                lower.push(null);
+            } else {
+                const slice = data.slice(i - period + 1, i + 1);
+                const mean = slice.reduce((a, b) => a + b, 0) / period;
+                const variance = slice.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / period;
+                const stdDev = Math.sqrt(variance);
+                
+                upper.push(mean + (multiplier * stdDev));
+                lower.push(mean - (multiplier * stdDev));
+            }
+        }
+        
+        return { upper, lower };
     }
 
     // 뉴스 목록 업데이트
