@@ -1,0 +1,75 @@
+name: Stock Data Crawler
+
+on:
+  schedule:
+    # 매일 새벽 1시 (UTC 기준, 한국 시간 새벽 10시)
+    - cron: '0 1 * * *'
+  workflow_dispatch: # 수동 실행 가능
+  push:
+    branches: [ main ]
+    paths:
+      - 'crawler/**'
+      - '.github/workflows/stock-crawler.yml'
+
+jobs:
+  crawl-stock-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        cd crawler
+        pip install -r requirements.txt
+        
+    - name: Test GitHub Actions environment
+      run: |
+        cd crawler
+        python test_github_actions.py
+        
+    - name: Run stock crawler
+      run: |
+        cd crawler
+        python stock_crawler.py
+        
+    - name: Check data files
+      run: |
+        echo "Generated data files:"
+        ls -la data/
+        echo "Latest data content preview:"
+        if [ -f "data/latest_stock_data.json" ]; then
+          head -20 data/latest_stock_data.json
+        fi
+        
+    - name: Commit and push data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update stock data - $(date -u +'%Y-%m-%d %H:%M UTC')"
+        git push
+        
+    - name: Create data summary
+      run: |
+        echo "## 📊 Stock Data Update Summary" >> $GITHUB_STEP_SUMMARY
+        echo "**Update Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+        echo "**Status:** ✅ Success" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📁 Generated Files:" >> $GITHUB_STEP_SUMMARY
+        ls -la data/ | grep -E "\.json$" | while read line; do
+          echo "- \`$line\`" >> $GITHUB_STEP_SUMMARY
+        done
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📈 Data Overview:" >> $GITHUB_STEP_SUMMARY
+        if [ -f "data/latest_stock_data.json" ]; then
+          echo "- **Stocks:** $(jq '.stocks | length' data/latest_stock_data.json) 종목" >> $GITHUB_STEP_SUMMARY
+          echo "- **News:** $(jq '.news | length' data/latest_stock_data.json) 건" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp:** $(jq -r '.timestamp' data/latest_stock_data.json)" >> $GITHUB_STEP_SUMMARY
+        fi

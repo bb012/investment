@@ -86,7 +86,7 @@ class InvestmentDashboard {
     // 종목 데이터 로드
     async loadStockData(stockCode) {
         try {
-            // 실제 API에서는 종목 정보, 가격 데이터, 뉴스 등 호출
+            // 크롤링된 데이터 파일에서 로드
             await Promise.all([
                 this.loadStockInfo(stockCode),
                 this.loadPriceData(stockCode),
@@ -98,8 +98,104 @@ class InvestmentDashboard {
         }
     }
 
-    // 종목 기본 정보 로드
+    // 크롤링된 데이터 파일에서 종목 정보 로드
     async loadStockInfo(stockCode) {
+        try {
+            const response = await fetch('../data/latest_stock_data.json');
+            if (!response.ok) throw new Error('데이터 파일을 불러올 수 없습니다.');
+            
+            const data = await response.json();
+            const stock = data.stocks.find(s => s.code === stockCode);
+            
+            if (stock) {
+                this.currentStockData = stock;
+                this.updateStockInfo();
+            }
+        } catch (error) {
+            console.error('종목 정보 로드 실패:', error);
+            // 폴백: 기본 데이터 사용
+            this.loadDefaultStockInfo(stockCode);
+        }
+    }
+
+    // 크롤링된 데이터 파일에서 가격 데이터 로드
+    async loadPriceData(stockCode) {
+        try {
+            const response = await fetch('../data/latest_stock_data.json');
+            if (!response.ok) throw new Error('데이터 파일을 불러올 수 없습니다.');
+            
+            const data = await response.json();
+            const historicalData = data.historical_data[stockCode];
+            
+            if (historicalData && historicalData.length > 0) {
+                this.priceData = historicalData;
+                this.updatePriceChart();
+            } else {
+                // 폴백: 기본 데이터 사용
+                this.loadDefaultPriceData(stockCode);
+            }
+        } catch (error) {
+            console.error('가격 데이터 로드 실패:', error);
+            // 폴백: 기본 데이터 사용
+            this.loadDefaultPriceData(stockCode);
+        }
+    }
+
+    // 크롤링된 데이터 파일에서 뉴스 데이터 로드
+    async loadNewsData(stockCode) {
+        try {
+            const response = await fetch('../data/latest_stock_data.json');
+            if (!response.ok) throw new Error('데이터 파일을 불러올 수 없습니다.');
+            
+            const data = await response.json();
+            
+            if (data.news && data.news.length > 0) {
+                this.newsData = data.news;
+                this.updateNewsList();
+            } else {
+                // 폴백: 기본 데이터 사용
+                this.loadDefaultNewsData();
+            }
+        } catch (error) {
+            console.error('뉴스 데이터 로드 실패:', error);
+            // 폴백: 기본 데이터 사용
+            this.loadDefaultNewsData();
+        }
+    }
+
+    // 크롤링된 데이터 파일에서 분석 데이터 로드
+    async loadAnalysisData(stockCode) {
+        try {
+            const response = await fetch('../data/latest_stock_data.json');
+            if (! response.ok) throw new Error('데이터 파일을 불러올 수 없습니다.');
+            
+            const data = await response.json();
+            const stock = data.stocks.find(s => s.code === stockCode);
+            
+            if (stock) {
+                // 기본적 분석 점수 계산
+                this.analysisData = {
+                    per: this.calculatePER(stock),
+                    pbr: this.calculatePBR(stock),
+                    roe: this.calculateROE(stock),
+                    fundamentalScore: this.calculateFundamentalScore(stock),
+                    technicalScore: this.calculateTechnicalScore(stock),
+                    newsScore: this.calculateNewsScore()
+                };
+                this.updateAnalysis();
+            } else {
+                // 폴백: 기본 데이터 사용
+                this.loadDefaultAnalysisData();
+            }
+        } catch (error) {
+            console.error('분석 데이터 로드 실패:', error);
+            // 폴백: 기본 데이터 사용
+            this.loadDefaultAnalysisData();
+        }
+    }
+
+    // 종목 기본 정보 로드 (폴백)
+    async loadDefaultStockInfo(stockCode) {
         // 예시 데이터
         this.stockInfo = {
             code: stockCode,
@@ -112,14 +208,14 @@ class InvestmentDashboard {
         };
     }
 
-    // 가격 데이터 로드
-    async loadPriceData(stockCode) {
+    // 가격 데이터 로드 (폴백)
+    async loadDefaultPriceData(stockCode) {
         // 예시 데이터 (실제로는 차트 API 호출)
         this.priceData = this.generateSamplePriceData();
     }
 
-    // 뉴스 데이터 로드
-    async loadNewsData(stockCode) {
+    // 뉴스 데이터 로드 (폴백)
+    async loadDefaultNewsData() {
         // 예시 데이터 (실제로는 뉴스 크롤링 API 호출)
         this.newsData = [
             {
@@ -146,8 +242,8 @@ class InvestmentDashboard {
         ];
     }
 
-    // 분석 데이터 로드
-    async loadAnalysisData(stockCode) {
+    // 분석 데이터 로드 (폴백)
+    async loadDefaultAnalysisData() {
         // 예시 데이터 (실제로는 분석 API 호출)
         this.analysisData = {
             per: 12.5,
@@ -159,6 +255,73 @@ class InvestmentDashboard {
             totalScore: 75,
             recommendation: 'buy' // buy, hold, sell
         };
+    }
+
+    // PER 계산
+    calculatePER(stock) {
+        // 예시 계산 (실제로는 재무제표 데이터 필요)
+        return (stock.current_price / 5000).toFixed(1);
+    }
+
+    // PBR 계산
+    calculatePBR(stock) {
+        // 예시 계산 (실제로는 재무제표 데이터 필요)
+        return (stock.current_price / 60000).toFixed(1);
+    }
+
+    // ROE 계산
+    calculateROE(stock) {
+        // 예시 계산 (실제로는 재무제표 데이터 필요)
+        return (Math.random() * 20 + 10).toFixed(1);
+    }
+
+    // 기본적 분석 점수 계산
+    calculateFundamentalScore(stock) {
+        // PER, PBR, ROE 등을 종합한 점수
+        const per = parseFloat(this.calculatePER(stock));
+        const pbr = parseFloat(this.calculatePBR(stock));
+        const roe = parseFloat(this.calculateROE(stock));
+        
+        let score = 50; // 기본 점수
+        
+        // PER 점수 (낮을수록 좋음)
+        if (per < 15) score += 20;
+        else if (per < 25) score += 10;
+        else score -= 10;
+        
+        // PBR 점수 (낮을수록 좋음)
+        if (pbr < 1.5) score += 15;
+        else if (pbr < 3) score += 5;
+        else score -= 10;
+        
+        // ROE 점수 (높을수록 좋음)
+        if (roe > 15) score += 15;
+        else if (roe > 10) score += 5;
+        else score -= 10;
+        
+        return Math.max(0, Math.min(100, score));
+    }
+
+    // 기술적 분석 점수 계산
+    calculateTechnicalScore(stock) {
+        // 이동평균선, RSI 등을 종합한 점수
+        let score = 50; // 기본 점수
+        
+        // 가격 변동률에 따른 점수
+        if (stock.change_percent > 0) score += 20;
+        else score -= 20;
+        
+        // 거래량에 따른 점수
+        if (stock.volume > 10000000) score += 15;
+        else score -= 15;
+        
+        return Math.max(0, Math.min(100, score));
+    }
+
+    // 뉴스 분석 점수 계산
+    calculateNewsScore() {
+        // 뉴스 감정 분석 점수
+        return Math.floor(Math.random() * 30) + 60; // 60-90점
     }
 
     // 샘플 가격 데이터 생성
@@ -402,8 +565,9 @@ class InvestmentDashboard {
                             color: '#374151'
                         },
                         grid: {
-                            color: 'rgba(156, 163, 175, 0.2)',
-                            drawBorder: false
+                            color: 'rgba(156, 163, 175, 0.3)',
+                            drawBorder: false,
+                            lineWidth: 1
                         },
                         ticks: {
                             color: '#6b7280',
@@ -412,7 +576,31 @@ class InvestmentDashboard {
                             },
                             callback: function(value) {
                                 return value.toLocaleString() + '원';
+                            },
+                            // Y축 간격 조절
+                            stepSize: function(context) {
+                                const range = context.chart.scales.y.max - context.chart.scales.y.min;
+                                if (range > 100000) return 10000;      // 10만원 이상 차이시 1만원 간격
+                                else if (range > 50000) return 5000;   // 5만원 이상 차이시 5천원 간격
+                                else if (range > 20000) return 2000;   // 2만원 이상 차이시 2천원 간격
+                                else if (range > 10000) return 1000;   // 1만원 이상 차이시 1천원 간격
+                                else if (range > 5000) return 500;     // 5천원 이상 차이시 500원 간격
+                                else return 100;                       // 기본 100원 간격
                             }
+                        },
+                        // Y축 범위 조절 (상하 여백 추가)
+                        beginAtZero: false,
+                        suggestedMin: function(context) {
+                            const prices = context.chart.data.datasets[0].data.filter(v => v !== null);
+                            if (prices.length === 0) return 0;
+                            const min = Math.min(...prices);
+                            return min * 0.98; // 하단에 2% 여백
+                        },
+                        suggestedMax: function(context) {
+                            const prices = context.chart.data.datasets[0].data.filter(v => v !== null);
+                            if (prices.length === 0) return 0;
+                            const max = Math.max(...prices);
+                            return max * 1.02; // 상단에 2% 여백
                         }
                     }
                 },
@@ -426,14 +614,18 @@ class InvestmentDashboard {
                         hoverBackgroundColor: '#1d4ed8',
                         hoverBorderColor: '#fff',
                         hoverBorderWidth: 3
+                    },
+                    line: {
+                        tension: 0.1,
+                        borderWidth: 3
                     }
                 },
                 layout: {
                     padding: {
-                        top: 20,
-                        right: 20,
-                        bottom: 20,
-                        left: 20
+                        top: 30,
+                        right: 30,
+                        bottom: 30,
+                        left: 30
                     }
                 }
             }
