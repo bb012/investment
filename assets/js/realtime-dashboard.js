@@ -20,73 +20,73 @@ class RealtimeDashboard {
                 const data = await response.json();
                 
                 if (data.market_indices) {
-                    // 국내 지수 (크롤링된 데이터)
+                    // 국내 지수 (크롤링된 데이터) - 2026년 2월 9일 기준
                     this.indicesData = {
                         kospi: {
                             name: 'KOSPI',
                             code: 'KS11',
-                            price: data.market_indices.kospi.value || 2450.00,
-                            change: data.market_indices.kospi.change || 15.50,
-                            changeRate: data.market_indices.kospi.change / data.market_indices.kospi.value * 100 || 0.64
+                            price: data.market_indices.kospi.value || 5298.00,
+                            change: data.market_indices.kospi.change || 208.50,
+                            changeRate: data.market_indices.kospi.change / data.market_indices.kospi.value * 100 || 4.10
                         },
                         kosdaq: {
                             name: 'KOSDAQ',
                             code: 'KQ11',
-                            price: data.market_indices.kosdaq.value || 850.25,
-                            change: data.market_indices.kosdaq.change || 8.75,
-                            changeRate: data.market_indices.kosdaq.change / data.market_indices.kosdaq.value * 100 || 1.04
+                            price: data.market_indices.kosdaq.value || 1085.30,
+                            change: data.market_indices.kosdaq.change || 32.15,
+                            changeRate: data.market_indices.kosdaq.change / data.market_indices.kosdaq.value * 100 || 3.05
                         },
                         sp500: {
                             name: 'S&P 500',
                             code: 'SPX',
-                            price: 4850.50,
-                            change: 25.30,
-                            changeRate: 0.52
+                            price: 6932.30,
+                            change: 133.91,
+                            changeRate: 1.97
                         },
                         nasdaq: {
                             name: 'NASDAQ',
                             code: 'IXIC',
-                            price: 15250.75,
-                            change: -45.20,
-                            changeRate: -0.30
+                            price: 23031.21,
+                            change: 490.12,
+                            changeRate: 2.18
                         },
                         dow: {
                             name: 'DOW',
                             code: 'DJI',
-                            price: 38250.00,
-                            change: 125.50,
-                            changeRate: 0.33
+                            price: 50115.67,
+                            change: 1206.95,
+                            changeRate: 2.47
                         },
                         gold: {
                             name: '금',
                             code: 'XAUUSD',
-                            price: 2150.50,
-                            change: 12.30,
-                            changeRate: 0.58,
+                            price: 5034.15,
+                            change: 84.15,
+                            changeRate: 1.70,
                             currency: 'USD'
                         },
                         oil: {
                             name: 'WTI 원유',
                             code: 'CL',
-                            price: 78.25,
-                            change: -1.50,
-                            changeRate: -1.88,
+                            price: 62.80,
+                            change: -1.25,
+                            changeRate: -1.95,
                             currency: 'USD'
                         },
                         bitcoin: {
                             name: '비트코인',
                             code: 'BTC',
-                            price: 65250.00,
-                            change: 1250.00,
-                            changeRate: 1.96,
+                            price: 75200.00,
+                            change: 1850.00,
+                            changeRate: 2.52,
                             currency: 'USD'
                         },
                         ethereum: {
                             name: '이더리움',
                             code: 'ETH',
-                            price: 3450.75,
-                            change: 45.25,
-                            changeRate: 1.33,
+                            price: 2105.00,
+                            change: -48.50,
+                            changeRate: -2.25,
                             currency: 'USD'
                         }
                     };
@@ -107,74 +107,74 @@ class RealtimeDashboard {
         this.updateIndicesDisplay();
     }
 
-    // 기본 지수 데이터 로드 (폴백)
+    // 기본 지수 데이터 로드 (2026년 2월 9일 기준 실제 데이터)
     loadDefaultIndicesData() {
         this.indicesData = {
             kospi: {
                 name: 'KOSPI',
                 code: 'KS11',
-                price: 2450.00,
-                change: 15.50,
-                changeRate: 0.64
+                price: 5298.00,
+                change: 208.50,
+                changeRate: 4.10
             },
             kosdaq: {
                 name: 'KOSDAQ',
                 code: 'KQ11',
-                price: 850.25,
-                change: 8.75,
-                changeRate: 1.04
+                price: 1085.30,
+                change: 32.15,
+                changeRate: 3.05
             },
             sp500: {
                 name: 'S&P 500',
                 code: 'SPX',
-                price: 4850.50,
-                change: 25.30,
-                changeRate: 0.52
+                price: 6932.30,
+                change: 133.91,
+                changeRate: 1.97
             },
             nasdaq: {
                 name: 'NASDAQ',
                 code: 'IXIC',
-                price: 15250.75,
-                change: -45.20,
-                changeRate: -0.30
+                price: 23031.21,
+                change: 490.12,
+                changeRate: 2.18
             },
             dow: {
                 name: 'DOW',
                 code: 'DJI',
-                price: 38250.00,
-                change: 125.50,
-                changeRate: 0.33
+                price: 50115.67,
+                change: 1206.95,
+                changeRate: 2.47
             },
             gold: {
                 name: '금',
                 code: 'XAUUSD',
-                price: 2150.50,
-                change: 12.30,
-                changeRate: 0.58,
+                price: 5034.15,
+                change: 84.15,
+                changeRate: 1.70,
                 currency: 'USD'
             },
             oil: {
                 name: 'WTI 원유',
                 code: 'CL',
-                price: 78.25,
-                change: -1.50,
-                changeRate: -1.88,
+                price: 62.80,
+                change: -1.25,
+                changeRate: -1.95,
                 currency: 'USD'
             },
             bitcoin: {
                 name: '비트코인',
                 code: 'BTC',
-                price: 65250.00,
-                change: 1250.00,
-                changeRate: 1.96,
+                price: 75200.00,
+                change: 1850.00,
+                changeRate: 2.52,
                 currency: 'USD'
             },
             ethereum: {
                 name: '이더리움',
                 code: 'ETH',
-                price: 3450.75,
-                change: 45.25,
-                changeRate: 1.33,
+                price: 2105.00,
+                change: -48.50,
+                changeRate: -2.25,
                 currency: 'USD'
             }
         };
